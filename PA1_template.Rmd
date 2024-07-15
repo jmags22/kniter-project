@@ -1,0 +1,61 @@
+---
+title: "Activity Monitoring Data Analysis"
+author: "Jen M"
+date: "2024-07-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r activity}
+library(readr)
+data <- read_csv("activity.csv")
+head(data)
+# Aggregate the total steps per day, removing missing values (NA)
+total_steps_per_day <- aggregate(steps ~ date, data = data, FUN = sum, na.rm = TRUE)
+
+# Create a histogram of total steps per day
+hist(total_steps_per_day$steps, main = "Histogram of Total Steps per Day", xlab = "Total Steps", col = "blue")
+
+# Calculate the mean and median of total steps per day
+mean_steps <- mean(total_steps_per_day$steps, na.rm = TRUE)
+median_steps <- median(total_steps_per_day$steps, na.rm = TRUE)
+
+# Output the mean and median to the report
+cat("The mean of total steps per day is:", mean_steps, "\n")
+cat("The median of total steps per day is:", median_steps, "\n")
+
+average_steps_per_interval <- aggregate(steps ~ interval, data = data, FUN = mean, na.rm = TRUE)
+plot(average_steps_per_interval$interval, average_steps_per_interval$steps, type = "l", xlab = "Interval", ylab = "Average Number of Steps", main = "Average Daily Activity Pattern")
+
+data_imputed <- data
+na_indices <- is.na(data_imputed$steps)
+data_imputed$steps[na_indices] <- ave(data$steps, data$interval, FUN = function(x) mean(x, na.rm = TRUE))[na_indices]
+
+# Verify imputation
+sum(is.na(data_imputed$steps))  # Should be 0
+
+data_imputed$date <- as.Date(data_imputed$date)
+data_imputed$day_type <- ifelse(weekdays(data_imputed$date) %in% c("Saturday", "Sunday"), "weekend", "weekday")
+average_steps_day_type <- aggregate(steps ~ interval + day_type, data_imputed, mean)
+
+library(lattice)
+xyplot(steps ~ interval | day_type, data = average_steps_day_type, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of Steps", main = "Average Steps by Day Type")
+
+# Here you can write conclusions or summarize findings.
+"This R Markdown document provides a structured way to analyze and report on the activity monitoring data. Be sure to replace `activity.csv` with the correct path to your data file if it's located in a different directory. Adjust any additional parameters or settings as needed for your specific analysis or dataset."
+
+
+### Key Adjustments Made: 1. **Chunk Labels:** Each code chunk has a unique label. 2. **Chunk Options:** Removed `include=FALSE` from analytical chunks to ensure that both code and output are displayed in the HTML document. 3. **Documentation:** Improved readability and structure of the document to ensure clarity in presentation and analysis.
+
+
+```
+
