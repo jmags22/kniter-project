@@ -50,6 +50,23 @@ average_steps_day_type <- aggregate(steps ~ interval + day_type, data_imputed, m
 library(lattice)
 xyplot(steps ~ interval | day_type, data = average_steps_day_type, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of Steps", main = "Average Steps by Day Type")
 
+# Save Histogram of Total Steps per Day
+png("figure/total_steps_per_day.png")
+hist(total_steps_per_day$steps, main = "Histogram of Total Steps per Day", xlab = "Total Steps", col = "blue")
+dev.off()
+
+# Save Plot of Average Daily Activity Pattern
+png("figure/average_daily_activity_pattern.png")
+plot(average_steps_per_interval$interval, average_steps_per_interval$steps, type = "l", xlab = "Interval", ylab = "Average Number of Steps", main = "Average Daily Activity Pattern")
+dev.off()
+
+# Save Panel Plot for Weekday vs Weekend Comparison
+png("figure/weekday_vs_weekend.png")
+library(lattice)
+xyplot(steps ~ interval | day_type, data = average_steps_day_type, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of Steps", main = "Average Steps by Day Type")
+dev.off()
+
+
 # Here you can write conclusions or summarize findings.
 "This R Markdown document provides a structured way to analyze and report on the activity monitoring data. Be sure to replace `activity.csv` with the correct path to your data file if it's located in a different directory. Adjust any additional parameters or settings as needed for your specific analysis or dataset."
 
